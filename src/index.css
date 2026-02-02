@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+@theme {
+  /* Premium Coffee Palette */
+  --color-coffee-950: #0a0908;
+  --color-coffee-900: #1a1614;
+  --color-coffee-800: #2c2522;
+  --color-coffee-700: #3d332e;
+  --color-coffee-500: #5e4d44;
+  --color-gold-500: #d4af37;
+  --color-gold-400: #e5c85a;
+  --color-gold-600: #b8860b;
+  --color-cream-100: #f5f1ed;
+  --color-cream-200: #e6dfd6;
+  --color-cream-50: #faf9f7;
+  
+  /* Liquid Glass Colors */
+  --color-glass-light: rgba(255, 255, 255, 0.05);
+  --color-glass-medium: rgba(255, 255, 255, 0.08);
+  --color-glass-dark: rgba(0, 0, 0, 0.2);
+  --color-glass-gold: rgba(212, 175, 55, 0.1);
+  
+  --font-heading: "Outfit", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-glow: glow 3s ease-in-out infinite;
+  
+  @keyframes shimmer {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  
+  @keyframes glow {
+    0%, 100% {
+      opacity: 0.5;
+      filter: blur(20px);
+    }
+    50% {
+      opacity: 0.8;
+      filter: blur(30px);
+    }
+  }
+}
+
+:root {
+  background-color: var(--color-coffee-950);
+  color: var(--color-cream-100);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+@layer base {
+  body {
+    @apply antialiased selection:bg-gold-500/30;
+    overflow-x: hidden;
+  }
+  
+  /* Liquid Glass Utility Classes */
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+      0 8px 32px 0 rgba(0, 0, 0, 0.37),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      0 8px 32px 0 rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  }
+  
+  .glass-gold {
+    background: rgba(212, 175, 55, 0.1);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    box-shadow: 
+      0 8px 32px 0 rgba(212, 175, 55, 0.2),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Mobile touch optimizations */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  button, a {
+    touch-action: manipulation;
+  }
+}
