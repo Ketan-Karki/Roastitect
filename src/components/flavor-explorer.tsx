@@ -1,5 +1,5 @@
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Coffee, ChevronDown } from "lucide-react";
 import { cn } from "../lib/utils";
 import { COFFEE_DATABASE } from "../lib/coffee-data";
@@ -20,7 +20,6 @@ export const FlavorExplorer = ({
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const controls = useAnimation();
-  const currentRotation = useRef(0);
 
   const profiles = Object.keys(COFFEE_DATABASE);
   const segmentAngle = 360 / profiles.length;
