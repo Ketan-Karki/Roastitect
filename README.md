@@ -172,6 +172,14 @@ Roastitect embraces an "architectural" approach to coffee brewing:
 - **Artistry** - Beautiful presentation and user experience
 - **Education** - Learning the journey from bean to cup
 
+## 🚀 Deployment
+
+The app can be deployed to a subdomain (e.g. **roastitect.ketankarki.wiki**) on a Digital Ocean droplet. Setup is one-time; after that, pushes to `main` deploy automatically via GitHub Actions.
+
+- **One-time server setup:** nginx config, web root, DNS, optional SSL — see **[deploy/README.md](deploy/README.md)**.
+- **GitHub secrets:** `DEPLOY_HOST`, `DEPLOY_USER`, `SSH_PRIVATE_KEY` (details in deploy README).
+- **Auto-deploy:** workflow [.github/workflows/deploy.yml](.github/workflows/deploy.yml) runs on push to `main` or `master`.
+
 ## 📝 Scripts
 
 - `npm run dev` - Start development server
