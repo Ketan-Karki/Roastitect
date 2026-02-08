@@ -180,6 +180,14 @@ The app can be deployed to a subdomain (e.g. **roastitect.ketankarki.wiki**) on 
 - **GitHub secrets:** `DEPLOY_HOST`, `DEPLOY_USER`, `SSH_PRIVATE_KEY` (details in deploy README).
 - **Auto-deploy:** workflow [.github/workflows/deploy.yml](.github/workflows/deploy.yml) runs on push to `main` or `master`.
 
+### "Permission denied (publickey)" in GitHub Actions
+
+1. **Public key must be on the server.** The key you put in `SSH_PRIVATE_KEY` has a matching **public** key (same key pair). On your **laptop**, run `cat ~/.ssh/id_ed25519.pub` (or `id_rsa.pub`). Then on the **server** (`ssh siu`), ensure that line is in `~/.ssh/authorized_keys`:  
+   `echo "paste-the-public-key-line" >> ~/.ssh/authorized_keys`
+2. **Use the correct user.** `DEPLOY_USER` must be the user that owns `~/.ssh/authorized_keys` on the server (e.g. `ketan` if you log in as `ketan@vegeta`).
+3. **No passphrase.** The private key in the secret must be for a key generated without a passphrase, or GitHub Actions cannot use it.
+4. **Paste the full private key.** In the secret, paste the entire key including the `-----BEGIN ... PRIVATE KEY-----` and `-----END ... PRIVATE KEY-----` lines, with no extra spaces at the start or end.
+
 ## 📝 Scripts
 
 - `npm run dev` - Start development server
