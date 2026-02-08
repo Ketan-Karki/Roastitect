@@ -162,10 +162,13 @@ export const FlavorExplorer = ({
         <motion.button
           onClick={spinWheel}
           disabled={isSpinning}
+          aria-label={isSpinning ? "Wheel is spinning" : "Spin the wheel to select a random brewing method"}
+          aria-busy={isSpinning}
+          aria-live="polite"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={cn(
-            "absolute z-40 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full font-heading font-black text-[10px] sm:text-xs md:text-sm lg:text-base tracking-tighter uppercase transition-all flex items-center justify-center p-3 sm:p-4 text-center",
+            "absolute z-40 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full font-heading font-black text-[10px] sm:text-xs md:text-sm lg:text-base tracking-tighter uppercase transition-all flex items-center justify-center p-3 sm:p-4 text-center focus:outline-none focus:ring-4 focus:ring-gold-400 focus:ring-offset-4 focus:ring-offset-coffee-950",
             isSpinning
               ? "glass text-gold-500/30 cursor-not-allowed"
               : "bg-gradient-to-br from-gold-400 to-gold-600 text-coffee-950 hover:from-gold-300 hover:to-gold-500 shadow-[0_10px_50px_rgba(212,175,55,0.6),inset_0_1px_0_rgba(255,255,255,0.3)] active:scale-95"
@@ -191,11 +194,14 @@ export const FlavorExplorer = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
             className="mt-8 sm:mt-12 md:mt-16 text-center z-10 w-full max-w-md px-4"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
           >
             <div className="inline-flex flex-col items-center w-full">
               <div className="glass-strong px-6 sm:px-8 py-4 sm:py-5 rounded-2xl sm:rounded-3xl w-full">
                 <div className="flex items-center justify-center gap-2 sm:gap-3 text-gold-400 mb-2 sm:mb-3">
-                  <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Coffee className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
                   <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.3em] sm:tracking-[0.4em]">
                     Architect's Choice
                   </span>
@@ -209,6 +215,7 @@ export const FlavorExplorer = ({
                 animate={{ y: [0, 8, 0] }}
                 transition={{ repeat: Infinity, duration: 2 }}
                 className="mt-6 sm:mt-8 flex flex-col items-center text-gold-500/40"
+                aria-hidden="true"
               >
                 <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8" />
               </motion.div>

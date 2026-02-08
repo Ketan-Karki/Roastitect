@@ -4,6 +4,7 @@ import { FlavorExplorer } from "./components/flavor-explorer";
 import { GrinderCalibration } from "./components/grinder-calibration";
 import { Journey } from "./components/journey";
 import { BrewMaster } from "./components/brew-master";
+import { ShareButton } from "./components/share-button";
 import { COFFEE_DATABASE, type GrinderType } from "./lib/coffee-data";
 
 const App = () => {
@@ -14,13 +15,22 @@ const App = () => {
 
   return (
     <main className="bg-coffee-950 min-h-screen overflow-x-hidden">
+      {/* Skip to main content link for keyboard navigation */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-gold-400 focus:text-coffee-950 focus:rounded-lg focus:font-bold focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
+
       <Hero />
 
-      <FlavorExplorer selectedId={selectedId} onSelect={setSelectedId} />
+      <div id="main-content">
+        <FlavorExplorer selectedId={selectedId} onSelect={setSelectedId} />
 
-      {selectedProfile && (
-        <>
-          {/* Selected Profile Section - Liquid Glass Card */}
+        {selectedProfile && (
+          <>
+            {/* Selected Profile Section - Liquid Glass Card */}
           <div
             id="journey-section"
             className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24 border-t border-gold-500/10"
@@ -47,6 +57,14 @@ const App = () => {
                       {note}
                     </span>
                   ))}
+                </div>
+
+                {/* Share Button */}
+                <div className="pt-4 sm:pt-6">
+                  <ShareButton
+                    profile={selectedProfile}
+                    grinder={selectedGrinder}
+                  />
                 </div>
               </div>
 
@@ -76,6 +94,7 @@ const App = () => {
           <BrewMaster profile={selectedProfile} />
         </>
       )}
+      </div>
 
       {/* Footer - Mobile Optimized */}
       <div className="h-[8vh] sm:h-[10vh] border-t border-gold-500/5 flex items-center justify-center px-4">

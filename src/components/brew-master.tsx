@@ -1,12 +1,20 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import { Timer, Play, Pause, RotateCcw, ChevronRight } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Timer, Play, Pause, RotateCcw, ChevronRight, Bell, BellOff } from "lucide-react";
 import { cn } from "../lib/utils";
 import type { CoffeeProfile } from "../lib/coffee-data";
+import {
+  requestNotificationPermission,
+  showNotification,
+  playNotificationSound,
+  vibrateDevice,
+} from "../lib/notifications";
 
 export const BrewMaster = ({ profile }: { profile: CoffeeProfile }) => {
   const [timeLeft, setTimeLeft] = useState(profile.brewTime);
   const [isActive, setIsActive] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const hasNotifiedRef = useRef(false);
 
   // Generate steps based on brew method
   const getSteps = () => {
@@ -112,6 +120,14 @@ export const BrewMaster = ({ profile }: { profile: CoffeeProfile }) => {
 
   const steps = getSteps();
 
+  // Check notification permission on mount
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      setNotificationsEnabled(true);
+    }
+  }, []);
+
+  // Timer effect with completion notification
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     if (isActive && timeLeft > 0) {
@@ -119,6 +135,11 @@ export const BrewMaster = ({ profile }: { profile: CoffeeProfile }) => {
         setTimeLeft((time) => {
           if (time <= 1) {
             setIsActive(false);
+            // Trigger completion notification
+            if (!hasNotifiedRef.current) {
+              handleTimerComplete();
+              hasNotifiedRef.current = true;
+            }
             return 0;
           }
           return time - 1;
@@ -148,12 +169,46 @@ export const BrewMaster = ({ profile }: { profile: CoffeeProfile }) => {
   useEffect(() => {
     setIsActive(false);
     setTimeLeft(profile.brewTime);
+    hasNotifiedRef.current = false;
   }, [profile.brewTime]);
 
-  const toggleTimer = () => setIsActive(!isActive);
+  const handleTimerComplete = () => {
+    // Play sound
+    playNotificationSound(0.3);
+
+    // Vibrate on mobile
+    vibrateDevice([200, 100, 200]);
+
+    // Show browser notification if enabled
+    if (notificationsEnabled) {
+      showNotification("☕ Brew Complete!", {
+        body: `Your ${profile.brewMethod} is ready. Enjoy your ${profile.region}!`,
+        tag: "brew-timer",
+        requireInteraction: false,
+      });
+    }
+  };
+
+  const toggleNotifications = async () => {
+    if (!notificationsEnabled) {
+      const permission = await requestNotificationPermission();
+      setNotificationsEnabled(permission === "granted");
+    } else {
+      setNotificationsEnabled(false);
+    }
+  };
+
+  const toggleTimer = () => {
+    setIsActive(!isActive);
+    if (!isActive) {
+      hasNotifiedRef.current = false; // Reset notification flag when starting
+    }
+  };
+
   const resetTimer = () => {
     setIsActive(false);
     setTimeLeft(profile.brewTime);
+    hasNotifiedRef.current = false;
   };
 
   const formatTime = (seconds: number) => {
@@ -231,20 +286,38 @@ export const BrewMaster = ({ profile }: { profile: CoffeeProfile }) => {
             <div className="flex gap-3 sm:gap-4 mt-8 sm:mt-12">
               <button
                 onClick={toggleTimer}
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-coffee-950 hover:scale-110 active:scale-95 transition-transform shadow-[0_0_40px_rgba(212,175,55,0.5),inset_0_1px_0_rgba(255,255,255,0.3)]"
+                aria-label={isActive ? "Pause brew timer" : "Start brew timer"}
+                aria-pressed={isActive}
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-coffee-950 hover:scale-110 active:scale-95 transition-transform shadow-[0_0_40px_rgba(212,175,55,0.5),inset_0_1px_0_rgba(255,255,255,0.3)] focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-2 focus:ring-offset-coffee-950"
               >
                 {isActive ? (
-                  <Pause className="w-7 h-7 sm:w-8 sm:h-8" />
+                  <Pause className="w-7 h-7 sm:w-8 sm:h-8" aria-hidden="true" />
                 ) : (
-                  <Play className="w-7 h-7 sm:w-8 sm:h-8 ml-0.5 sm:ml-1" />
+                  <Play className="w-7 h-7 sm:w-8 sm:h-8 ml-0.5 sm:ml-1" aria-hidden="true" />
                 )}
               </button>
               <button
                 onClick={resetTimer}
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full glass border border-gold-500/20 flex items-center justify-center text-gold-400 hover:bg-gold-500/10 active:scale-95 transition-all"
+                aria-label="Reset brew timer to starting time"
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full glass border border-gold-500/20 flex items-center justify-center text-gold-400 hover:bg-gold-500/10 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-2 focus:ring-offset-coffee-950"
               >
-                <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
+                <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
               </button>
+              {("Notification" in window) && (
+                <button
+                  onClick={toggleNotifications}
+                  aria-label={notificationsEnabled ? "Disable notifications" : "Enable notifications"}
+                  aria-pressed={notificationsEnabled}
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full glass border border-gold-500/20 flex items-center justify-center text-gold-400 hover:bg-gold-500/10 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-2 focus:ring-offset-coffee-950"
+                  title={notificationsEnabled ? "Notifications enabled" : "Enable notifications"}
+                >
+                  {notificationsEnabled ? (
+                    <Bell className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
+                  ) : (
+                    <BellOff className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
