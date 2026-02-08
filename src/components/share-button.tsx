@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Share2, Check, Copy } from "lucide-react";
 import { cn } from "../lib/utils";
 import type { CoffeeProfile, GrinderType } from "../lib/coffee-data";
-import { shareProfile, generateShareText } from "../lib/share";
+import { shareProfile } from "../lib/share";
 
 type ShareButtonProps = {
   profile: CoffeeProfile;
@@ -18,6 +18,9 @@ export const ShareButton = ({
 }: ShareButtonProps) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+
+  // Check if Web Share API is available
+  const hasWebShare = typeof navigator !== "undefined" && "share" in navigator;
 
   const handleShare = async () => {
     if (isSharing) return;
@@ -71,7 +74,7 @@ export const ShareButton = ({
               exit={{ scale: 0 }}
               className="flex items-center gap-2 sm:gap-3"
             >
-              {navigator.share ? (
+              {hasWebShare ? (
                 <>
                   <Share2 className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
                   <span className="hidden sm:inline">Share Recipe</span>
@@ -92,7 +95,7 @@ export const ShareButton = ({
       {/* Tooltip on hover (desktop only) */}
       <div className="hidden lg:block absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
         <div className="glass-strong px-3 py-2 rounded-lg text-xs text-cream-200 whitespace-nowrap">
-          {navigator.share ? "Share via..." : "Copy to clipboard"}
+          {hasWebShare ? "Share via..." : "Copy to clipboard"}
           <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-coffee-900/80 backdrop-blur-sm rotate-45" />
         </div>
       </div>
