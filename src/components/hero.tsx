@@ -1,13 +1,20 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useState } from "react";
 import { BackgroundBeams } from "./background-beams";
 import { CoffeeScene } from "./coffee-scene";
 
 export const Hero = () => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const { scrollYProgress } = useScroll();
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setScrollProgress(latest);
+  });
+
   return (
     <section className="relative min-h-screen w-full flex flex-col items-center justify-start pt-20 sm:pt-24 md:pt-32 overflow-hidden bg-coffee-950">
       <BackgroundBeams />
 
-      {/* Liquid Glass Background Layers */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold-500/5 rounded-full blur-3xl animate-float" />
         <div
@@ -51,7 +58,6 @@ export const Hero = () => {
         </motion.p>
       </div>
 
-      {/* 3D Coffee Scene - Mobile Optimized */}
       <div className="w-full flex justify-center z-20 -mt-12 sm:-mt-16 md:-mt-20 lg:-mt-32 xl:-mt-40 pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -59,11 +65,10 @@ export const Hero = () => {
           transition={{ duration: 1.2, delay: 0.8 }}
           className="w-full max-w-6xl pointer-events-auto"
         >
-          <CoffeeScene />
+          <CoffeeScene scrollProgress={scrollProgress} />
         </motion.div>
       </div>
 
-      {/* Scroll Indicator - Mobile Optimized */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
