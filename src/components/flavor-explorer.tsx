@@ -13,12 +13,13 @@ import { COFFEE_DATABASE } from "../lib/coffee-data";
  * - High Fidelity: Metallic gradients, drop shadows, and motion-blur ease curves.
  */
 export const FlavorExplorer = ({
+  selectedId,
   onSelect,
 }: {
-  onSelect: (id: string) => void;
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
 }) => {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const controls = useAnimation();
 
   const profiles = Object.keys(COFFEE_DATABASE);
@@ -28,29 +29,14 @@ export const FlavorExplorer = ({
     if (isSpinning) return;
 
     setIsSpinning(true);
-    setSelectedId(null);
+    onSelect(null); // clear so card and section below stay in sync
 
-    // 1. Pick a random winner index
-    const winningIndex = Math.floor(Math.random() * profiles.length);
-    const targetId = profiles[winningIndex];
-
-    // 2. Calculate the target rotation
-    // We want the winning segment to be at the top (0 degrees).
-    // The wheel segments are placed at (i * segmentAngle) in the wheel container.
-    // To bring segment i to 0, we need to rotate the wheel clockwise by (360 - i * segmentAngle) mod 360.
-    // But we want multiple spins, so: extraSpins * 360 + (360 - winningIndex * segmentAngle)
+    // 1. Pick a random final rotation (multiple full spins + random segment at top)
     const extraSpins = 5 + Math.floor(Math.random() * 3); // 5-7 full spins
-    // Calculate base rotation to bring winning segment to top
-    const baseRotation = (360 - winningIndex * segmentAngle) % 360;
-    const totalRotation = extraSpins * 360 + baseRotation;
+    const randomSegmentIndex = Math.floor(Math.random() * profiles.length);
+    const baseRotation = (360 - randomSegmentIndex * segmentAngle) % 360;
+    const finalRotation = extraSpins * 360 + baseRotation;
 
-    // Add subtle visual jitter within the segment (±10 degrees) for realism
-    // Subtracting from the target because a positive rotation moves segments clockwise
-    const offset = (Math.random() - 0.5) * (segmentAngle * 0.4);
-    const finalRotation = totalRotation + offset;
-
-    // Update the rotation relative to the current position to avoid "jump" if spun twice
-    // But we use useAnimation which handles the transition from current state properly.
     await controls.start({
       rotate: finalRotation,
       transition: {
@@ -59,9 +45,22 @@ export const FlavorExplorer = ({
       },
     });
 
-    // 3. Set the winner
+    // 2. Derive winner from actual final rotation so pointer and description always match
+    const normalizedAngle = ((finalRotation % 360) + 360) % 360;
+    const winningIndex =
+      Math.floor((360 - normalizedAngle) / segmentAngle) % profiles.length;
+    const targetId = profiles[winningIndex];
+
+    console.log("🎯 Wheel stopped:", {
+      finalRotation,
+      normalizedAngle,
+      winningIndex,
+      targetId,
+      brewMethod: COFFEE_DATABASE[targetId].brewMethod,
+      region: COFFEE_DATABASE[targetId].region,
+    });
+
     setIsSpinning(false);
-    setSelectedId(targetId);
     onSelect(targetId);
 
     // 4. Scroll to results

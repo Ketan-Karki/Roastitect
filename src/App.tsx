@@ -16,7 +16,7 @@ const App = () => {
     <main className="bg-coffee-950 min-h-screen overflow-x-hidden">
       <Hero />
 
-      <FlavorExplorer onSelect={setSelectedId} />
+      <FlavorExplorer selectedId={selectedId} onSelect={setSelectedId} />
 
       {selectedProfile && (
         <>
